@@ -1,0 +1,38 @@
+﻿@page "/aspnetroles"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="aspnetroles/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.AspNetRoles">
+    <PropertyColumn Property="aspnetrole => aspnetrole.Name" />
+    <PropertyColumn Property="aspnetrole => aspnetrole.NormalizedName" />
+    <PropertyColumn Property="aspnetrole => aspnetrole.ConcurrencyStamp" />
+
+    <TemplateColumn Context="aspnetrole">
+        <a href="@($"aspnetroles/edit?id={aspnetrole.Id}")">Edit</a> |
+        <a href="@($"aspnetroles/details?id={aspnetrole.Id}")">Details</a> |
+        <a href="@($"aspnetroles/delete?id={aspnetrole.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

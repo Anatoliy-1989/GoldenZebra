@@ -1,0 +1,72 @@
+﻿@page "/aspnetusers/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>AspNetUser</h2>
+    <hr />
+    @if (aspnetuser is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">UserName</dt>
+            <dd class="col-sm-10">@aspnetuser.UserName</dd>
+            <dt class="col-sm-2">NormalizedUserName</dt>
+            <dd class="col-sm-10">@aspnetuser.NormalizedUserName</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@aspnetuser.Email</dd>
+            <dt class="col-sm-2">NormalizedEmail</dt>
+            <dd class="col-sm-10">@aspnetuser.NormalizedEmail</dd>
+            <dt class="col-sm-2">EmailConfirmed</dt>
+            <dd class="col-sm-10">@aspnetuser.EmailConfirmed</dd>
+            <dt class="col-sm-2">PasswordHash</dt>
+            <dd class="col-sm-10">@aspnetuser.PasswordHash</dd>
+            <dt class="col-sm-2">SecurityStamp</dt>
+            <dd class="col-sm-10">@aspnetuser.SecurityStamp</dd>
+            <dt class="col-sm-2">ConcurrencyStamp</dt>
+            <dd class="col-sm-10">@aspnetuser.ConcurrencyStamp</dd>
+            <dt class="col-sm-2">PhoneNumber</dt>
+            <dd class="col-sm-10">@aspnetuser.PhoneNumber</dd>
+            <dt class="col-sm-2">PhoneNumberConfirmed</dt>
+            <dd class="col-sm-10">@aspnetuser.PhoneNumberConfirmed</dd>
+            <dt class="col-sm-2">TwoFactorEnabled</dt>
+            <dd class="col-sm-10">@aspnetuser.TwoFactorEnabled</dd>
+            <dt class="col-sm-2">LockoutEnd</dt>
+            <dd class="col-sm-10">@aspnetuser.LockoutEnd</dd>
+            <dt class="col-sm-2">LockoutEnabled</dt>
+            <dd class="col-sm-10">@aspnetuser.LockoutEnabled</dd>
+            <dt class="col-sm-2">AccessFailedCount</dt>
+            <dd class="col-sm-10">@aspnetuser.AccessFailedCount</dd>
+        </dl>
+        <div>
+            <a href="@($"/aspnetusers/edit?id={aspnetuser.Id}")">Edit</a> |
+            <a href="@($"/aspnetusers")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private AspNetUser? aspnetuser;
+
+    [SupplyParameterFromQuery]
+    private string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        aspnetuser = await context.AspNetUsers.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (aspnetuser is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,60 @@
+﻿@page "/metaltypes/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Удаление</PageTitle>
+
+<h1>Удаление</h1>
+
+<p>Вы уверены что хотите удалить металл?</p>
+<div>
+    <hr />
+    @if (metaltype is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Название</dt>
+            <dd class="col-sm-10">@metaltype.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Проба стандартная</dt>
+            <dd class="col-sm-10">@metaltype.DefaultFiness</dd>
+        </dl>
+        <EditForm method="post" Model="metaltype" OnValidSubmit="DeleteMetalType" FormName="delete" Enhance>
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="/metaltypes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+                <button type="submit" class="btn btn-danger" disabled="@(metaltype is null)"><i class="bi bi-trash"></i> Delete</button>
+            </div>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private MetalType? metaltype;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        metaltype = await context.MetalTypes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (metaltype is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteMetalType()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MetalTypes.Remove(metaltype!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/metaltypes");
+    }
+}

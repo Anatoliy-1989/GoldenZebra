@@ -1,0 +1,154 @@
+﻿@page "/users"
+@using BlazorBootstrap
+@using BlazorGoldenZebra.Components.Modal
+@using BlazorGoldenZebra.Components.UserManagement.ModalForms
+@using BlazorGoldenZebra.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@* @inject GoldenZebraSecurityContext context *@
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@* @inject UserManager<ApplicationUser> userManager *@
+
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+
+@rendermode InteractiveServer
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+
+@attribute [Authorize(Roles = "admin")]
+
+<h3>Пользователи</h3>
+
+<div class="btn-group" role="group" aria-label="Basic example">
+	<Button Color="ButtonColor.Success" @onclick="(() => CreateUser())"><i class="bi bi-plus"></i> Добавить</Button>
+	<a class="btn btn-primary" href="aspnetroles"><i class="bi bi-file-earmark-plus"></i> Роли</a>
+</div>
+
+<QuickGrid Class="table" TGridItem="AspNetUser" ItemsProvider="GetFilteredMovies">
+    <PropertyColumn Property="user => user.UserName" Sortable="true" Title="Login">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="titleFilter" @bind:event="oninput" autofocus />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+	<TemplateColumn Context="user" Title="Заблокирован">
+		@if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.Now)
+		{
+			<i class="bi bi-lock-fill text-danger"></i>
+		}
+		else
+		{
+			<i class="bi bi-unlock-fill text-success"></i>
+		}
+	</TemplateColumn>
+    <PropertyColumn Property="user => string.Join(',', user.Roles.Select(x => x.Name))" Title="Роли" />
+
+	<TemplateColumn Context="user">
+		<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+			<Button Color="ButtonColor.Warning" @onclick="(() => EditUser(user.Id))"><i class="bi bi-pencil"></i></Button>
+			<Button Color="ButtonColor.Secondary" @onclick="(() => ChangeUserPassword(user.Id))"><i class="bi bi-key"></i> Пароль</Button>
+		</div>
+    </TemplateColumn>
+</QuickGrid>
+
+@* <Button Color="ButtonColor.Primary" @onclick="(()=> ShowEmployeeComponent(""c64ca888-8d6d-46b1-a697-466cfa5d1964""))">Show Employee Component</Button> *@
+@* <Button Color="ButtonColor.Primary" @onclick="Clicked">ClickMe</Button>
+<button class="btn btn-primary" @onclick="Clicked">Click me2</button>
+<p role="status">Current count: @currentCount</p> *@
+
+<Modal @ref="modal" />
+
+@code {
+	string titleFilter = "";
+
+	private Modal modal = default!;
+
+	private int currentCount = 0;
+
+	// PaginationState State = new PaginationState { ItemsPerPage = 2 };
+
+	public IQueryable<AspNetUser> FilteredMovies => context.AspNetUsers.Include(u => u.Roles);
+
+	private GoldenZebraSecurityContext context = default!;
+
+	protected override void OnInitialized()
+	{
+		context ??= DbFactory.CreateDbContext();
+	}
+
+	// public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+	// protected override async void OnInitialized()
+	// {
+
+	// }
+
+	private async Task EditUser(string id)
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("UserId", id);
+		parameters.Add("AfterSave", HideModal);
+
+		await modal.ShowAsync<UserEditModal>(title: "Редактирование пользователя", parameters: parameters);
+	}
+
+	private async Task CreateUser()
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("AfterSave", HideModal);
+
+		await modal.ShowAsync<CreateUserModal>(title: "Создание нового пользователя", parameters: parameters);		
+	}
+
+	private async Task HideModal()
+	{
+		await modal.HideAsync();
+	}
+
+	private async Task ChangeUserPassword(string id)
+	{
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("UserId", id);
+		parameters.Add("AfterSave", HideModal);
+
+		await modal.ShowAsync<ChangeUserPasswordModal>(title: "Смена пароля пользователя", parameters: parameters);
+	}
+
+	private async Task Clicked(MouseEventArgs args)
+	{
+
+		currentCount += 2;
+		var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+		var principal = authstate.User;
+		var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
+		var user = await UserManager.GetUserAsync(principal);
+		var roles = await UserManager.GetRolesAsync(user);
+	}
+
+	public async ValueTask<GridItemsProviderResult<AspNetUser>> GetFilteredMovies(
+			GridItemsProviderRequest<AspNetUser> request)
+	{
+
+		using var context = DbFactory.CreateDbContext();
+		var totalCount = await context.AspNetUsers.CountAsync(request.CancellationToken);
+
+		IQueryable<AspNetUser> query = context.AspNetUsers.Include(u => u.Roles).OrderBy(x => x.UserName);
+		query = request.ApplySorting(query).Skip(request.StartIndex);
+		if (request.Count.HasValue)
+		{
+			query = query.Take(request.Count.Value);
+		}
+		var items = await query.ToArrayAsync(request.CancellationToken);
+		var result = new GridItemsProviderResult<AspNetUser>
+			{
+				Items = items,
+				TotalItemCount = totalCount
+			};
+
+		return result;
+	}
+}

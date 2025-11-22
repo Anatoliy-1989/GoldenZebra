@@ -1,0 +1,446 @@
+﻿@page "/orders/create"
+
+@using BlazorGoldenZebra.Components.Pages.OrderItemPages
+@using BlazorGoldenZebra.Data
+@using BlazorGoldenZebra.Models.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JSRuntime
+
+@attribute [Authorize(Roles = "admin, manager")]
+
+@rendermode InteractiveServer
+
+<PageTitle>Создание пакета</PageTitle>
+<div class="box-container">
+    <div class="filter-section">
+<h1>Добавление пакета</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="Order" method="post" OnValidSubmit="AddOrder" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <input type="hidden" name="Order.Id" value="@Order.Id" />
+            <div class="mb-3">
+                <label for="userid" class="form-label">Пользователь:</label>
+                <AuthorizeView Roles="admin" Context="authContext">
+                    <Authorized>
+                        <InputSelect @bind-Value="Order.UserId" class="form-select">
+                            @foreach (var user in Users)
+                            {
+                                <option value="@user.Id">@user.UserName</option>
+                            }
+                        </InputSelect>
+                    </Authorized>
+                    <NotAuthorized>
+                        <InputSelect @bind-Value="Order.UserId" class="form-select" disabled>
+                            @foreach (var user in Users)
+                            {
+                                <option value="@user.Id">@user.UserName</option>
+                            }
+                        </InputSelect>
+                    </NotAuthorized>
+                </AuthorizeView>
+                
+                    
+                <ValidationMessage For="() => Order.UserId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Дата и время:</label> 
+                @if (Mode == "show")
+                {
+                    <InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="Order.Date" class="form-control" disabled />
+                }
+                else if (Mode == "create")
+                {
+                    <InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="Order.Date" class="form-control" />
+                }
+                else if (Mode == "edit")
+                {
+                    <AuthorizeView Roles="admin" Context="authContext">
+                        <Authorized>
+                            <InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="Order.Date" class="form-control" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="Order.Date" class="form-control" disabled />
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
+
+                <ValidationMessage For="() => Order.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="placeid" class="form-label">Отделение:</label> 
+                @if (Mode == "show")
+                {
+                    <InputSelect @bind-Value="Order.PlaceId" class="form-select" disabled>
+                        @foreach (var place in Places)
+                        {
+                            <option value="@place.Id">@place.Name</option>
+                        }
+                    </InputSelect>
+                }
+                else if (Mode == "create")
+                {
+                    <InputSelect @bind-Value="Order.PlaceId" class="form-select">
+                        @foreach (var place in Places)
+                        {
+                            <option value="@place.Id">@place.Name</option>
+                        }
+                    </InputSelect>
+                }
+                else if (Mode == "edit")
+                {
+                    <AuthorizeView Roles="admin" Context="authContext">
+                        <Authorized>
+                            <InputSelect @bind-Value="Order.PlaceId" class="form-select">
+                                @foreach (var place in Places)
+                                {
+                                    <option value="@place.Id">@place.Name</option>
+                                }
+                            </InputSelect>
+                        </Authorized>
+                        <NotAuthorized>
+                            <InputSelect @bind-Value="Order.PlaceId" class="form-select" disabled>
+                                @foreach (var place in Places)
+                                {
+                                    <option value="@place.Id">@place.Name</option>
+                                }
+                            </InputSelect>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
+                <ValidationMessage For="() => Order.PlaceId" class="text-danger" /> 
+            </div>        
+             <div class="btn-group" role="group" aria-label="Basic example">
+                    <a class="btn btn-secondary" href="/orders"><i class="bi bi-arrow-left"></i> Назад к списку</a>
+            @if (Mode == "show")
+            {
+            }
+            else if (Mode == "create")
+            {
+                <button type="submit" class="btn btn-success"><i class="bi bi-file-earmark-plus"></i> Создать</button>
+            }
+            else if (Mode == "edit")
+            {
+                <AuthorizeView Roles="admin" Context="authContext">
+                    <Authorized>
+                        <button type="submit" class="btn btn-warning"><i class="bi bi-pencil"></i> Сохранить</button>
+                    </Authorized>
+                </AuthorizeView>
+            }
+                    </div>
+        </EditForm>
+
+        <hr/>
+                
+                
+        @if (Mode == "show")
+        {
+        }
+        else if (Mode == "create")
+        {
+            <Button Color="ButtonColor.Primary" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
+        }
+        else if (Mode == "edit")
+        {
+            <AuthorizeView Roles="admin" Context="authContext">
+                <Authorized>
+                    <Button Color="ButtonColor.Primary" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
+                </Authorized>
+            </AuthorizeView>
+        }
+                
+            </div>
+        </div>
+
+        <div class="table-container">
+        <QuickGrid Class="table quickgrid-striped hover-scroll-y" TGridItem="OrderItemViewModel" Items="Order.OrderItems.AsQueryable()">
+            <PropertyColumn Property="orderItem => orderItem.ProductTypeName" Title="Тип" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.MetalTypeName" Title="Металл" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.WeightDirty" Title="Вес грязный" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.WeightClean" Title="Вес чистый" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.Fineness" Title="Проба" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.DefaultMetalFinessWeight" Title="Вес станд. пробы" Sortable="true" />
+            <PropertyColumn Property="orderItem => orderItem.Cost" Title="Стоимость" Sortable="true" />
+            <TemplateColumn Context="orderItem">
+                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                @if (Mode == "show")
+                {
+                }
+                else if (Mode == "create")
+                {                
+                        <Button Color="ButtonColor.Warning" @onclick="(() => EditOrderItem(orderItem))" Style="width: auto;"><i class="bi bi-pencil"></i></Button>
+                        <Button Color="ButtonColor.Danger" @onclick="(() => RemoveOrderItem(orderItem))" Style="width: auto;"><i class="bi bi-trash"></i></Button>                
+                }
+                else if (Mode == "edit")
+                {
+                    <AuthorizeView Roles="admin" Context="authContext">
+                        <Authorized>
+                            <Button Color="ButtonColor.Warning" @onclick="(() => EditOrderItem(orderItem))" Style="width: auto;"><i class="bi bi-pencil"></i></Button>
+                            <Button Color="ButtonColor.Danger" @onclick="(() => RemoveOrderItem(orderItem))" Style="width: auto;"><i class="bi bi-trash"></i></Button>
+                        </Authorized>
+                    </AuthorizeView>
+                }
+                </div>
+            </TemplateColumn>
+        </QuickGrid>
+        </div>
+    </div>
+</div>
+
+<Modal @ref="modal" />
+
+@code {
+
+    [SupplyParameterFromQuery(Name = "mode")]
+    public string Mode { get; set; } = "create";
+
+    [SupplyParameterFromQuery(Name = "id")]
+    public string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private OrderViewModel Order { get; set; } = new() 
+    { 
+        Date = DateTime.Now,
+    };
+
+    private List<ApplicationUser> Users;
+    private List<Place> Places;
+
+    private Modal modal = default!;
+
+    protected override void OnInitialized()
+    {
+        var authstate = GetAuthenticationStateAsync.GetAuthenticationStateAsync().ConfigureAwait(true).GetAwaiter().GetResult();
+        var principal = authstate.User;
+        var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
+        var user = UserManager.GetUserAsync(principal).ConfigureAwait(true).GetAwaiter().GetResult();
+
+        this.Users = UserManager.Users.ToList();
+
+        using var context = DbFactory.CreateDbContext();
+        this.Places = context.Places.ToList();
+
+        var metals = context.MetalTypes.ToList();
+        var productTypes = context.ProductTypes.ToList();
+
+        if (this.Mode != "create" && int.TryParse(this.Id, out int orderId))
+        {
+            var order = context.Orders.Include(o => o.OrderItems).Single(x => x.Id == orderId);
+
+            this.Order.InitFromOrder(order);
+            foreach (var orderItem in this.Order.OrderItems)
+            {
+                orderItem.MetalTypeName = metals.Single(x => x.Id == orderItem.MetalType).Name;
+                orderItem.DefaultMetalFiness = metals.Single(x => x.Id == orderItem.MetalType).DefaultFiness;
+                orderItem.ProductTypeName = productTypes.Single(x => x.Id == orderItem.ProductType).Name;
+            }
+        }
+        else
+        {
+            this.Order.UserId = user.Id;
+        }
+
+        base.OnInitialized();
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddOrder()
+    {
+        switch (Mode)
+        {
+            case "edit":
+                await EditOrderAsync();
+                break;
+            case "create":
+                await CreateOrderAsync();
+                break;
+        }
+    }
+
+    private async Task CreateOrderAsync()
+    {
+        if (this.Order.PlaceId <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не выбрано отделение!");
+            return;
+        }
+
+        if (!this.Order.OrderItems.Any())
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не добавлено ни одной позиции!");
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+
+        var newOrder = new Order()
+        {
+            Date = this.Order.Date,
+            DateCreate = DateTime.Now,
+            PlaceId = this.Order.PlaceId,
+            UserId = this.Order.UserId
+        };
+
+        foreach (var newItem in this.Order.OrderItems)
+        {
+            newOrder.OrderItems.Add(new OrderItem()
+            {
+                Fineness = newItem.Fineness,
+                MetalType = newItem.MetalType,
+                ProductType = newItem.ProductType,
+                WeightClean = newItem.WeightClean,
+                WeightDirty = newItem.WeightDirty,
+                Cost = newItem.Cost,
+            });
+        }
+
+
+
+        context.Orders.Add(newOrder);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/orders");
+    }
+
+    [Authorize(Roles = "admin")]
+    private async Task EditOrderAsync()
+    {
+        if (this.Order.PlaceId <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не выбрано отделение!");
+            return;
+        }
+
+        if (!this.Order.OrderItems.Any())
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не добавлено ни одной позиции!");
+            return;
+        }
+
+        using var context = DbFactory.CreateDbContext();
+
+        var oldOrder = context.Orders.Include(x => x.OrderItems).Single(x => x.Id == this.Order.Id);
+        oldOrder.Date = this.Order.Date;
+        oldOrder.PlaceId = this.Order.PlaceId;
+        oldOrder.UserId = this.Order.UserId;
+
+        foreach (var orderItemView in this.Order.OrderItems)
+        {
+            if (orderItemView.Id == 0)
+            {
+                // Add new
+                oldOrder.OrderItems.Add(CreateOrderItemFromModel(orderItemView));
+            }
+            else
+            {
+                // Modify existed
+                var oldOrderItem = oldOrder.OrderItems.Single(x => x.Id == orderItemView.Id);
+                MapOrderItemFromModel(oldOrderItem, orderItemView);
+            }
+        }
+
+        List<OrderItem> badOrderItems = new List<OrderItem>();
+
+        foreach (var oldOrderItem in oldOrder.OrderItems)
+        {
+            var savedOrderItem = this.Order.OrderItems.SingleOrDefault(x => x.Id == oldOrderItem.Id);
+
+            if (savedOrderItem == null)
+            {
+                badOrderItems.Add(oldOrderItem);
+            }
+        }
+
+        foreach (var badOrderItem in badOrderItems)
+        {
+            oldOrder.OrderItems.Remove(badOrderItem);
+        }
+
+        await context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/orders");
+    }
+
+    private OrderItem CreateOrderItemFromModel(OrderItemViewModel orderItemModel)
+    {
+        var newOrderItem = new OrderItem();
+        MapOrderItemFromModel(newOrderItem, orderItemModel);
+        return newOrderItem;
+    }
+
+    private void MapOrderItemFromModel(OrderItem orderItem, OrderItemViewModel orderItemModel)
+    {
+        orderItem.Fineness = orderItemModel.Fineness;
+        orderItem.MetalType = orderItemModel.MetalType;
+        orderItem.ProductType = orderItemModel.ProductType;
+        orderItem.WeightClean = orderItemModel.WeightClean;
+        orderItem.WeightDirty = orderItemModel.WeightDirty;
+        orderItem.Cost = orderItemModel.Cost;
+    }
+
+    private async Task HideModal(OrderItemViewModel orderItem)
+    {
+        await modal.HideAsync();
+
+        var newOrderItem = new OrderItemViewModel()
+            {
+                Fineness = orderItem.Fineness,
+                Id = orderItem.Id,
+                MetalType = orderItem.MetalType,
+                MetalTypeName = orderItem.MetalTypeName,
+                OrderId = orderItem.OrderId,
+                ProductType = orderItem.ProductType,
+                ProductTypeName = orderItem.ProductTypeName,
+                WeightClean = orderItem.WeightClean,
+                WeightDirty = orderItem.WeightDirty,
+                DefaultMetalFiness = orderItem.DefaultMetalFiness,
+                Cost = orderItem.Cost,
+            };
+
+
+        this.Order.OrderItems.Add(newOrderItem);
+        this.StateHasChanged();
+    }
+
+    private async Task HideModal2(OrderItemViewModel orderItem)
+    {
+        await modal.HideAsync();
+
+        this.StateHasChanged();
+    }
+
+    private async Task AddOrderItemAsync(MouseEventArgs args)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("AfterSave", HideModal);
+
+        await modal.ShowAsync<CreateOrderItem>(title: "Добавить позицию пакета", parameters: parameters);
+    }
+
+    private async Task EditOrderItem(OrderItemViewModel orderItemViewModel)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("AfterSave", HideModal2);
+        parameters.Add("ExistedOrderItem", orderItemViewModel);
+
+        await modal.ShowAsync<CreateOrderItem>(title: "Добавить позицию пакета", parameters: parameters);
+    }
+
+    private void RemoveOrderItem(OrderItemViewModel orderItemViewModel)
+    {
+        this.Order.OrderItems.Remove(orderItemViewModel);
+        // this.StateHasChanged();
+    }
+    
+}

@@ -1,0 +1,97 @@
+﻿@page "/metaltypes/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Редактирование</PageTitle>
+
+@attribute [Authorize(Roles = "admin")]
+
+<h2>Металл</h2>
+<hr />
+@if (MetalType is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MetalType" OnValidSubmit="UpdateMetalType" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="MetalType.Id" value="@MetalType.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Название:</label>
+                    <InputText id="name" @bind-Value="MetalType.Name" class="form-control" />
+                    <ValidationMessage For="() => MetalType.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="defaultfiness" class="form-label">Проба стандартная:</label>
+                    <InputNumber id="defaultfiness" @bind-Value="MetalType.DefaultFiness" class="form-control" />
+                    <ValidationMessage For="() => MetalType.DefaultFiness" class="text-danger" />
+                </div>
+                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                    <a href="/metaltypes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+                    <button type="submit" class="btn btn-warning"><i class="bi bi-pencil"></i> Сохранить</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private MetalType? MetalType { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MetalType ??= await context.MetalTypes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (MetalType is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMetalType()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MetalType!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MetalTypeExists(MetalType!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/metaltypes");
+    }
+
+    private bool MetalTypeExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MetalTypes.Any(e => e.Id == id);
+    }
+}

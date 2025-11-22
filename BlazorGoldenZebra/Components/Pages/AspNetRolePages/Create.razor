@@ -1,0 +1,55 @@
+﻿@page "/aspnetroles/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>AspNetRole</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="AspNetRole" OnValidSubmit="AddAspNetRole" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="AspNetRole.Name" class="form-control" /> 
+                <ValidationMessage For="() => AspNetRole.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="normalizedname" class="form-label">NormalizedName:</label> 
+                <InputText id="normalizedname" @bind-Value="AspNetRole.NormalizedName" class="form-control" /> 
+                <ValidationMessage For="() => AspNetRole.NormalizedName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="concurrencystamp" class="form-label">ConcurrencyStamp:</label> 
+                <InputText id="concurrencystamp" @bind-Value="AspNetRole.ConcurrencyStamp" class="form-control" /> 
+                <ValidationMessage For="() => AspNetRole.ConcurrencyStamp" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/aspnetroles">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private AspNetRole AspNetRole { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAspNetRole()
+    {
+        using var context = DbFactory.CreateDbContext();
+        this.AspNetRole.Id = Guid.NewGuid().ToString();
+        context.AspNetRoles.Add(AspNetRole);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/aspnetroles");
+    }
+}

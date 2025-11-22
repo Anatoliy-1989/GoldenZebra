@@ -1,0 +1,18 @@
+﻿@rendermode InteractiveServer
+
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="@HRef">
+        <span class="bi @MenuItemClass" aria-hidden="true"></span> @Caption
+    </NavLink>
+</div>
+
+@code {
+    [Parameter]
+    public string HRef { get; set; }
+
+    [Parameter]
+    public string MenuItemClass { get; set; }
+
+    [Parameter]
+    public string Caption { get; set; }
+}

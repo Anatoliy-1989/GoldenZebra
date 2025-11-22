@@ -1,0 +1,19 @@
+﻿<div class="row">
+	@foreach (var metalType in this.MetalTypes)
+	{
+		<div>
+			@metalType.Name:
+		</div>
+		<div>
+			@TotalMetals[metalType.Id]
+		</div>
+	}
+</div>
+
+@code {
+	[Parameter]
+	public List<MetalType> MetalTypes { get; set; }
+
+	private Dictionary<int, decimal> TotalMetals;
+
+}

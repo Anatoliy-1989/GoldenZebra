@@ -1,0 +1,40 @@
+﻿@page "/places"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Отделения</PageTitle>
+
+<h1>Отделения</h1>
+
+<p>
+    <a href="places/create" class="btn btn-primary"><i class="bi bi-plus"></i> Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Places">
+    <PropertyColumn Property="place => place.Name" Title="Название"/>
+    <PropertyColumn Property="place => place.City" Title="Город" />
+    <PropertyColumn Property="place => place.Street" Title="Улица" />
+    <PropertyColumn Property="place => place.House" Title="Дом" />
+
+    <TemplateColumn Context="place">
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a href="@($"places/edit?id={place.Id}")" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+            <a href="@($"places/details?id={place.Id}")" class="btn btn-secondary"><i class="bi bi-eye"></i></a>
+            <a href="@($"places/delete?id={place.Id}")" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+        </div>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

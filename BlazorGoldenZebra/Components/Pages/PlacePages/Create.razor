@@ -1,0 +1,57 @@
+﻿@page "/places/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Создание</PageTitle>
+
+<h2>Отделение</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Place" OnValidSubmit="AddPlace" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Название:</label>
+                <InputText id="name" @bind-Value="Place.Name" class="form-control" /> 
+                <ValidationMessage For="() => Place.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="city" class="form-label">Город:</label> 
+                <InputText id="city" @bind-Value="Place.City" class="form-control" /> 
+                <ValidationMessage For="() => Place.City" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="street" class="form-label">Улица:</label> 
+                <InputText id="street" @bind-Value="Place.Street" class="form-control" /> 
+                <ValidationMessage For="() => Place.Street" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="house" class="form-label">Дом:</label> 
+                <InputText id="house" @bind-Value="Place.House" class="form-control" /> 
+                <ValidationMessage For="() => Place.House" class="text-danger" /> 
+            </div>    
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="/places" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+                <button type="submit" class="btn btn-success"><i class="bi bi-plus"></i> Добавить</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    [SupplyParameterFromForm]
+    private Place Place { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddPlace()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Places.Add(Place);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/places");
+    }
+}

@@ -1,0 +1,47 @@
+﻿@page "/aspnetusers"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="aspnetusers/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.AspNetUsers">
+    <PropertyColumn Property="aspnetuser => aspnetuser.UserName" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.NormalizedUserName" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.Email" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.NormalizedEmail" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.EmailConfirmed" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.PasswordHash" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.SecurityStamp" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.ConcurrencyStamp" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.PhoneNumber" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.PhoneNumberConfirmed" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.TwoFactorEnabled" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.LockoutEnd" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.LockoutEnabled" />
+    <PropertyColumn Property="aspnetuser => aspnetuser.AccessFailedCount" />
+
+    <TemplateColumn Context="aspnetuser">
+        <a href="@($"aspnetusers/edit?id={aspnetuser.Id}")">Edit</a> |
+        <a href="@($"aspnetusers/delete?id={aspnetuser.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

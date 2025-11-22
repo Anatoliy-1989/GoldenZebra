@@ -1,0 +1,55 @@
+﻿@page "/producttypes/delete"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>ProductType</h2>
+    <hr />
+    @if (producttype is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@producttype.Name</dd>
+        </dl>
+        <EditForm method="post" Model="producttype" OnValidSubmit="DeleteProductType" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(producttype is null)">Delete</button> |
+            <a href="/producttypes">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ProductType? producttype;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        producttype = await context.ProductTypes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (producttype is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteProductType()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ProductTypes.Remove(producttype!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/producttypes");
+    }
+}

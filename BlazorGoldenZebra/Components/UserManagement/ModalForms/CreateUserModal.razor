@@ -1,0 +1,110 @@
+﻿@using BlazorGoldenZebra.Data
+@using BlazorGoldenZebra.Models.ViewModels
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject UserManager<ApplicationUser> _userManager
+@inject IDbContextFactory<GoldenZebraSecurityContext> DbFactory
+@inject IJSRuntime JSRuntime
+
+@attribute [Authorize(Roles = "admin")]
+
+<div class="row">
+    <div class="col-md-12">
+        <EditForm method="post" Model="NewUser" OnValidSubmit="CreateUserAsync" FormName="edit" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary role="alert" />
+            <div class="mb-6">
+                <label for="userName" class="form-label">Login:</label>
+                <InputText id="userName" @bind-Value="NewUser.UserName" class="form-control" />
+                <ValidationMessage For="() => NewUser.UserName" class="text-danger" />
+            </div>
+            <div class="mb-6">
+                <label for="password" class="form-label">Пароль:</label>
+                <InputText id="password" @bind-Value="NewUser.Password" class="form-control" />
+                <ValidationMessage For="() => NewUser.Password" class="text-danger" />
+            </div>
+            <div class="mb-6">
+                @foreach (var userRole in NewUser.UserRoles)
+                {
+                    <label>
+                        <InputCheckbox @bind-Value="userRole.IsInRole" />
+                        @userRole.RoleName
+                    </label>
+                }
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-success"><i class="bi bi-plus"></i> Сохранить</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Func<Task> AfterSave { get; set; }
+
+    [SupplyParameterFromForm]
+    private CreateUserModel? NewUser { get; set; } = new CreateUserModel();
+
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context ??= DbFactory.CreateDbContext();
+        var roles = context.AspNetRoles.ToList();
+
+        foreach (var role in roles)
+        {
+            NewUser.UserRoles.Add(new UserRoleModel
+            {
+                RoleName = role.Name
+            });
+        }
+
+        context.Dispose();
+    }
+
+    private async Task CreateUserAsync()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(NewUser.UserName))
+            {
+                await JSRuntime.InvokeVoidAsync("", "Имя пользователя не должно быть пустым!");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(NewUser.Password))
+            {
+                await JSRuntime.InvokeVoidAsync("", "Пароль не может быть пустым!");
+                return;
+            }
+
+            var user = new ApplicationUser() 
+            { 
+                UserName = NewUser.UserName, 
+                Email = "test@ya.ru"
+            };
+            user.EmailConfirmed = true;
+            var result = await _userManager.CreateAsync(user, NewUser.Password);
+
+            if (result.Succeeded)
+            {
+                foreach (var role in NewUser.UserRoles.Where(x => x.IsInRole).ToList())
+                {
+                    await _userManager.AddToRoleAsync(user, role.RoleName);
+                }
+
+                if (AfterSave != null)
+                {
+                    await AfterSave();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("", "ex.Message!");
+            // throw new Exception(ex.Message);
+        }
+    }
+}

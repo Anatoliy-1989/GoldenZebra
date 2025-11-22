@@ -1,0 +1,51 @@
+﻿@page "/metaltypes/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>Сведения</PageTitle>
+
+<h1>Металл</h1>
+
+<div>
+    <hr />
+    @if (metaltype is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Наименование</dt>
+            <dd class="col-sm-10">@metaltype.Name</dd>
+            <dt class="col-sm-2">Проба стандартная</dt>
+            <dd class="col-sm-10">@metaltype.DefaultFiness</dd>
+        </dl>
+        <div>
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="/metaltypes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+                <a href="@($"metaltypes/edit?id={metaltype.Id}")" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private MetalType? metaltype;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        metaltype = await context.MetalTypes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (metaltype is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

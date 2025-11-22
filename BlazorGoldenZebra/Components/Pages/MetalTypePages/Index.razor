@@ -1,0 +1,41 @@
+﻿@page "/metaltypes"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+
+@attribute [Authorize(Roles = "admin")]
+
+<PageTitle>Металлы</PageTitle>
+
+<h1>Металлы</h1>
+
+<p>
+    <a href="metaltypes/create" class="btn btn-primary"><i class="bi bi-plus"></i> Добавить</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MetalTypes">
+    <PropertyColumn Property="metaltype => metaltype.Name" Title="Название металла"/>
+    <PropertyColumn Property="metaltype => metaltype.DefaultFiness" Title="Проба стандартная" />
+
+    <TemplateColumn Context="metaltype">
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a href="@($"metaltypes/edit?id={metaltype.Id}")" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+            <a href="@($"metaltypes/details?id={metaltype.Id}")" class="btn btn-secondary"><i class="bi bi-eye"></i></a>
+            <a href="@($"metaltypes/delete?id={metaltype.Id}")" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+        </div>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

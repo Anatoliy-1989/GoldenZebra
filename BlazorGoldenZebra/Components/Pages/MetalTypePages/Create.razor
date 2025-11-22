@@ -1,0 +1,48 @@
+﻿@page "/metaltypes/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Создание</PageTitle>
+
+<h1>Создание металла</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="MetalType" OnValidSubmit="AddMetalType" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="MetalType.Name" class="form-control" /> 
+                <ValidationMessage For="() => MetalType.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="defaultfiness" class="form-label">DefaultFiness:</label> 
+                <InputNumber id="defaultfiness" @bind-Value="MetalType.DefaultFiness" class="form-control" /> 
+                <ValidationMessage For="() => MetalType.DefaultFiness" class="text-danger" /> 
+            </div>        
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <a href="/metaltypes" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+                <button type="submit" class="btn btn-success"><i class="bi bi-plus"></i> Добавить</button>
+            </div>
+            
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MetalType MetalType { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMetalType()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MetalTypes.Add(MetalType);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/metaltypes");
+    }
+}

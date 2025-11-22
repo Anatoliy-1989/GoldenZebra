@@ -1,0 +1,51 @@
+﻿@page "/places/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Сведения</PageTitle>
+
+<h1>Отделение</h1>
+
+<div>
+    <hr />
+    @if (place is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Название</dt>
+            <dd class="col-sm-10">@place.Name</dd>
+            <dt class="col-sm-2">Город</dt>
+            <dd class="col-sm-10">@place.City</dd>
+            <dt class="col-sm-2">Улица</dt>
+            <dd class="col-sm-10">@place.Street</dd>
+            <dt class="col-sm-2">Дом</dt>
+            <dd class="col-sm-10">@place.House</dd>
+        </dl>
+        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+            <a href="/places" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад</a>
+            <a href="@($"places/edit?id={place.Id}")" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+        </div>
+    }
+</div>
+
+@code {
+    private Place? place;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        place = await context.Places.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (place is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

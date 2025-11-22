@@ -1,0 +1,404 @@
+﻿@page "/orders-statistics"
+@using BlazorGoldenZebra.Data
+@using BlazorGoldenZebra.Models.Common
+@using BlazorGoldenZebra.Models.ViewModels
+@using BlazorGoldenZebra.Utills
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@using System.Security.Claims
+@using System.Globalization
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
+@inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "admin")]
+
+@rendermode InteractiveServer
+
+<script type="text/javascript">
+	function saveAsFile(filename, bytesBase64) {
+		var link = document.createElement('a');
+		link.download = filename;
+		link.href = "data:application/octet-stream;base64," + bytesBase64;
+		document.body.appendChild(link); // Needed for Firefox
+		link.click();
+		document.body.removeChild(link);
+	}
+</script>
+
+<PageTitle>Пакеты</PageTitle>
+<div class="box-container">
+	<div class="filter-section">
+<h1>Пакеты</h1>
+
+<!--Totals-->
+<!--Filter-->
+<AuthorizeView Roles="admin">
+	<Authorized>
+		<dl class="row">
+			<dt class="col-sm-2">Дата начала</dt>
+			<dd class="col-sm-10">
+				<InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="FilterStartDate" class="form-control" />
+			</dd>
+			<dt class="col-sm-2">Дата конца</dt>
+			<dd class="col-sm-10">
+				<InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="FilterEndDate" class="form-control" />
+			</dd>
+			<dt class="col-sm-2">Пользователь</dt>
+			<dd class="col-sm-10">
+				<InputSelect @bind-Value="FilterUserId" class="form-select">
+					<option value="" selected>-</option>
+					@foreach (var user in Users)
+					{
+						<option value="@user.Id">@user.UserName</option>
+					}
+				</InputSelect>
+			</dd>
+					<dt class="col-sm-2">Город</dt>
+					<dd class="col-sm-10">
+						<InputSelect @bind-Value="FilterCity" class="form-select">
+							<option value="" selected>-</option>
+							@foreach (var city in this.Cities)
+							{
+								<option value="@city">@city</option>
+							}
+						</InputSelect>
+					</dd>
+		</dl>
+	</Authorized>
+</AuthorizeView>
+
+
+<div class="row">
+	@foreach (var metalType in this.MetalTypes)
+	{
+		<div class="col-md-1">
+			@metalType.Name:
+		</div>
+		<div class="col-md-1">
+			@Decimal.Round(TotalMetals[metalType.Id], 2)
+		</div>
+	}
+</div>
+		<div class="row">
+			<div class="col-md-1">
+				Общ. вес изделий:
+			</div>
+			<div class="col-md-1">
+				@Data.Sum(om => om.Orders.Sum(o => MetalWorker.GetProductWeight(o)) ?? 0)
+			</div>
+			<div class="col-md-1">
+				Сумма лом:
+			</div>
+			<div class="col-md-1">
+				@Data.Sum(om => om.Orders.Sum(o => MetalWorker.GetScrapSum(o)) ?? 0)
+			</div>
+			<div class="col-md-1">
+				Сумма изделий:
+			</div>
+			<div class="col-md-1">
+				@Data.Sum(om => om.Orders.Sum(o => MetalWorker.GetProductSum(o)) ?? 0)
+			</div>
+		</div>
+
+<div class="row">
+	<p class="col-md-6">
+	</p>
+	<p class="col-md-6">
+		<AuthorizeView Roles="admin">
+			<Authorized>
+				<Button @onclick="DownloadFile" class="btn btn-success float-end"><i class="bi bi-filetype-xls"></i> В Excel</Button>
+			</Authorized>
+		</AuthorizeView>
+	</p>
+</div>
+
+	</div>
+
+
+<div class="table-container">
+<QuickGrid id="data-quick-grid" Class="table quickgrid-striped hover-scroll-y" @ref="myQuickGrid" TGridItem="OrderStatisticsViewModel" ItemsProvider="GetOrderData">
+	<PropertyColumn Property="order => order.Place" Title="Отделение" />
+
+	@foreach (var columnDefinition in ColumnDefinitions)
+	{
+		@if (columnDefinition.IsVisible)
+		{
+					<PropertyColumn Property="@(order => GetPropertyValueScrapWeight(order, columnDefinition.PropertyName))"
+							Title="@columnDefinition.Title" />
+		}
+	}
+
+			<PropertyColumn Property="order => order.Orders.Sum(o => MetalWorker.GetProductWeight(o))" Title="Общ. вес изделий" />
+			<PropertyColumn Property="order => order.Orders.Sum(o => MetalWorker.GetScrapSum(o))" Title="Сумма лом" />
+			<PropertyColumn Property="order => order.Orders.Sum(o => MetalWorker.GetProductSum(o))" Title="Сумма изделий" />
+
+	<PropertyColumn Property="order => order.OrderAmount" Title="Кол. пакетов" Sortable="true" />
+	<PropertyColumn Property="order => order.Positions" Title="Кол. позиций" Sortable="true" />
+</QuickGrid>
+</div>
+</div>
+
+@code {
+
+	private DateTime? FilterStartDate = DateTime.Today;
+	private DateTime? FilterEndDate;
+	private string FilterUserId;
+	private string FilterCity;
+
+	private Dictionary<int, decimal> TotalMetals;
+	private string[] Cities;
+
+	private QuickGrid<OrderStatisticsViewModel> myQuickGrid;
+	private List<OrderStatisticsViewModel> Data = new List<OrderStatisticsViewModel>();
+
+	private List<MetalType> MetalTypes;
+
+	private List<ProductType> ProductTypes;
+
+	private List<Place> Places;
+	private List<AspNetUser> Users;
+	ApplicationUser CurrentUser;
+
+	private AuthenticationState AuthState;
+
+	private GoldenZebraSecurityContext context = default!;
+
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+
+		this.MetalTypes = context.MetalTypes.OrderBy(x => x.Id).ToList();
+		this.ProductTypes = context.ProductTypes.ToList();
+		this.Places = context.Places.OrderBy(x => x.Name).ToList();
+		this.Users = context.AspNetUsers.OrderBy(x => x.UserName).ToList();
+
+		TotalMetals = new Dictionary<int, decimal>(
+			MetalTypes.Select(x =>
+				new KeyValuePair<int, decimal>(x.Id, 0)
+			).ToArray());
+
+		Cities = this.Places.Select(p => p.City).Distinct().OrderBy(x => x).ToArray();
+
+		this.AuthState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().ConfigureAwait(true).GetAwaiter().GetResult();
+		var principal = this.AuthState.User;
+		var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
+		var user = UserManager.GetUserAsync(principal).ConfigureAwait(true).GetAwaiter().GetResult();
+		CurrentUser = user;
+	}
+
+	private List<OrderStatisticsViewModel> GetData(GridItemsProviderRequest<OrderStatisticsViewModel> request)
+	{
+		using var context = DbFactory.CreateDbContext();
+
+
+		IQueryable<Order> query = context.Orders.Include(x => x.OrderItems).OrderBy(x => x.DateCreate);
+
+		if (FilterStartDate.HasValue)
+		{
+			query = query.Where(x => x.Date >= FilterStartDate);
+		}
+		if (FilterEndDate.HasValue)
+		{
+			query = query.Where(x => x.Date <= FilterEndDate);
+		}
+		if (!string.IsNullOrWhiteSpace(FilterUserId))
+		{
+			query = query.Where(x => x.UserId == FilterUserId);
+		}
+		if (!string.IsNullOrWhiteSpace(FilterCity))
+		{
+			query = query.Where(x => x.Place.City == FilterCity);
+		}
+
+		var items = query.ToArray();
+
+		TotalMetals = new Dictionary<int, decimal>(
+			MetalTypes.Select(m =>
+				new KeyValuePair<int, decimal>(m.Id, items.Sum(o => MetalWorker.GetScrapDefaultFinessWeight(o, m) ?? 0))).ToArray());
+
+		var data = new List<OrderStatisticsViewModel>();
+
+		foreach (var place in this.Places)
+		{
+			var placeItems = items.Where(i => i.PlaceId == place.Id)
+										.ToList();
+			if (placeItems.Any())
+			{
+				var viewModel = new OrderStatisticsViewModel()
+				{
+					Place = place.Name,
+					OrderAmount = placeItems.Count,
+					Positions = placeItems.Sum(i => i.OrderItems.Count),
+					Orders = placeItems
+				};
+
+				var placeOrderItems = placeItems.SelectMany(i => i.OrderItems)
+												.ToList();
+
+				if (placeOrderItems.Any())
+				{
+					viewModel.OrderItems = placeOrderItems.Select(oi =>
+					OrderItemExportModel.CreateFromOrderItem(oi, MetalTypes)).ToList();
+				}
+				
+				data.Add(viewModel);
+			}
+		}
+
+		Data = data;
+
+		StateHasChanged();
+
+		return data;
+	}
+
+	public async ValueTask<GridItemsProviderResult<OrderStatisticsViewModel>> GetOrderData(
+			GridItemsProviderRequest<OrderStatisticsViewModel> request)
+	{
+		var items = GetData(request);
+
+		var result = new GridItemsProviderResult<OrderStatisticsViewModel>
+		{
+			Items = items,
+			TotalItemCount = items.Count
+		};
+
+		return result;
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+	private List<ColumnDefinition> _ColumnDefinitions;
+	private List<ColumnDefinition> ColumnDefinitions
+	{
+		get
+		{
+			if (_ColumnDefinitions == null)
+			{
+				_ColumnDefinitions = new List<ColumnDefinition>();
+
+				foreach (var metal in this.MetalTypes)
+				{
+
+					var newColumn = new ColumnDefinition
+					{
+						PropertyName = metal.Id.ToString(),
+						Title = metal.Name,
+						Format = "F2",
+						IsSortable = false
+					};
+
+					_ColumnDefinitions.Add(newColumn);
+				}
+			}
+
+			return _ColumnDefinitions;
+		}
+	}
+
+	private decimal? GetPropertyValueScrapWeight(OrderStatisticsViewModel order, string propertyName)
+	{
+		if (int.TryParse(propertyName, out var metalTypeId))
+		{
+			var metal = this.MetalTypes.Single(x => x.Id == metalTypeId);
+			return order.Orders.Sum(o => MetalWorker.GetScrapDefaultFinessWeight(o, metal));
+		}
+
+		return null;
+	}
+
+	private void EditOrder(Order order)
+	{
+		NavigationManager.NavigateTo($"/orders/create?mode=edit&id={order.Id}");
+	}
+
+	private async Task RemoveOrderAsync(Order order)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Действительно удалить пакет?");
+
+		if (confirmed)
+		{
+			this.context.Orders.Remove(order);
+			this.context.SaveChanges();
+		}
+	}
+
+	private void ShowOrder(Order order)
+	{
+		NavigationManager.NavigateTo($"/orders/create?mode=show&id={order.Id}");
+	}
+
+	private async Task FilterOrders(MouseEventArgs args)
+	{
+		await myQuickGrid.RefreshDataAsync();
+	}
+
+	private string GetPlaceName(int placeId)
+	{
+		if (placeId <= 0)
+		{
+			return "Всего:";
+		}
+		else
+		{
+			return Places.Single(p => p.Id.Equals(placeId)).Name;
+		}
+	}
+
+	private string GetUserName(string userId)
+	{
+		if (string.IsNullOrWhiteSpace(userId))
+		{
+			return "";
+		}
+		else
+		{
+			return Users.Single(x => x.Id.Equals(userId)).UserName;
+		}
+
+	}
+
+	// myQuickGrid.ChildContent.ToString();
+
+	public ValueTask WriteTextAsync(string text)
+	{
+		return JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+	}
+
+	private async Task SaveToClipboard()
+	{
+		// var tableBytes = XmlWorker.GenerateExcel2();
+		await WriteTextAsync("Hello from gold!"/* myQuickGrid.ChildContent.ToString() */);
+	}
+
+	public async Task SaveAs(string filename, byte[] data)
+	{
+		await JSRuntime.InvokeAsync<object>(
+			"saveAsFile",
+			filename,
+			Convert.ToBase64String(data));
+	}
+
+	void DownloadFile()
+	{
+		// var text = "Hello, world!";
+		// var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+
+		var bytes = GetXmlBytes();
+		SaveAs($"Statista{DateTime.Today.ToShortDateString()}.xlsx", bytes);
+	}
+
+	private byte[] GetXmlBytes()
+	{
+		var bytes = XmlWorker.CreateXlsxDocumentAsByteArray(Data, MetalTypes);
+		return bytes;
+	}
+}

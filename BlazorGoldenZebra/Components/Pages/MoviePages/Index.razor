@@ -1,0 +1,56 @@
+﻿@page "/movies"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Data
+@{/* @attribute [Authorize(Roles = "admin, manager")] */}
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@rendermode InteractiveServer
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="movies/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="FilteredMovies" Pagination="State">
+    <PropertyColumn Property="movie => movie.Title" Sortable="true">
+        <ColumnOptions>
+            <div>
+                <input type="search" @bind="titleFilter" @bind:event="oninput" autofocus />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="movie => movie.ReleaseDate" Title="Release Date" Format="dd/MM/yyyy"/>
+    <PropertyColumn Property="movie => movie.Genre" />
+    <PropertyColumn Property="movie => movie.Price" />
+
+    <TemplateColumn Context="movie">
+        <a href="@($"movies/edit?id={movie.Id}")">Edit</a> |
+        <a href="@($"movies/details?id={movie.Id}")">Details</a> |
+        <a href="@($"movies/delete?id={movie.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="State"></Paginator>
+
+@code {
+
+    string titleFilter = "";
+
+    PaginationState State = new PaginationState { ItemsPerPage = 2 };
+
+    public IQueryable<Movie> FilteredMovies => context.Movies.Where(x => x.Title.Contains(titleFilter));
+
+
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

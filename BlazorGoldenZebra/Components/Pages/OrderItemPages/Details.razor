@@ -1,0 +1,56 @@
+﻿@page "/orderitems/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>OrderItem</h2>
+    <hr />
+    @if (orderitem is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">MetalType</dt>
+            <dd class="col-sm-10">@orderitem.MetalType</dd>
+            <dt class="col-sm-2">ProductType</dt>
+            <dd class="col-sm-10">@orderitem.ProductType</dd>
+            <dt class="col-sm-2">OrderId</dt>
+            <dd class="col-sm-10">@orderitem.OrderId</dd>
+            <dt class="col-sm-2">WeightDirty</dt>
+            <dd class="col-sm-10">@orderitem.WeightDirty</dd>
+            <dt class="col-sm-2">WeightClean</dt>
+            <dd class="col-sm-10">@orderitem.WeightClean</dd>
+            <dt class="col-sm-2">Fineness</dt>
+            <dd class="col-sm-10">@orderitem.Fineness</dd>
+        </dl>
+        <div>
+            <a href="@($"/orderitems/edit?id={orderitem.Id}")">Edit</a> |
+            <a href="@($"/orderitems")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private OrderItem? orderitem;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        orderitem = await context.OrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (orderitem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

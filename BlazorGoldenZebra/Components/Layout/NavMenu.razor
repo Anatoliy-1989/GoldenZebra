@@ -1,0 +1,146 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorGoldenZebra</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-box-seam-fill-nav-menu" aria-hidden="true"></span> Пакеты
+            </NavLink>
+        </div>
+
+        
+
+        @* <NavMenuItem Caption="Users" HRef="users" MenuItemClass="bi-plus-square-fill-nav-menu" /> *@
+
+        <AuthorizeView Roles="admin">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="orders-statistics">
+                        <span class="bi bi-bar-chart-nav-menu" aria-hidden="true"></span> Статистика
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="places">
+                        <span class="bi bi-houses-fill-nav-menu" aria-hidden="true"></span> Отделения
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="metaltypes">
+                        <span class="bi bi-minecart-loaded-nav-menu" aria-hidden="true"></span> Металлы
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="users">
+                        <span class="bi bi-people-fill-nav-menu" aria-hidden="true"></span> Пользователи
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div> *@
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div> *@
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="todo">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> ToDo
+            </NavLink>
+        </div> *@
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="movies">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Movies
+            </NavLink>
+        </div> *@
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="aspnetroles">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Roles
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="aspnetusers">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Users
+            </NavLink>
+        </div> *@
+
+        @* <div class="nav-item px-3">
+            <NavLink class="nav-link" href="auth">
+                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
+            </NavLink>
+        </div> *@
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav-item px-3">
+                    @* <NavLink class="nav-link" href="Account/Manage/ChangePassword"> *@
+                        <NavLink class="nav-link" href="Account/Manage/ChangePassword">
+                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <button type="submit" class="nav-link">
+                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                        </button>
+                    </form>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                @* <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Register">
+                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div> *@
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="Account/Login">
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+    </nav>
+</div>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
+

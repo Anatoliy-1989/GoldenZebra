@@ -1,0 +1,114 @@
+﻿@page "/orderitems/edit"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>OrderItem</h2>
+<hr />
+@if (OrderItem is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="OrderItem" OnValidSubmit="UpdateOrderItem" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="OrderItem.Id" value="@OrderItem.Id" />
+                <div class="mb-3">
+                    <label for="metaltype" class="form-label">MetalType:</label>
+                    <InputNumber id="metaltype" @bind-Value="OrderItem.MetalType" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.MetalType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="producttype" class="form-label">ProductType:</label>
+                    <InputNumber id="producttype" @bind-Value="OrderItem.ProductType" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.ProductType" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="orderid" class="form-label">OrderId:</label>
+                    <InputNumber id="orderid" @bind-Value="OrderItem.OrderId" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.OrderId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weightdirty" class="form-label">WeightDirty:</label>
+                    <InputNumber id="weightdirty" @bind-Value="OrderItem.WeightDirty" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.WeightDirty" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="weightclean" class="form-label">WeightClean:</label>
+                    <InputNumber id="weightclean" @bind-Value="OrderItem.WeightClean" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.WeightClean" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="fineness" class="form-label">Fineness:</label>
+                    <InputNumber id="fineness" @bind-Value="OrderItem.Fineness" class="form-control" />
+                    <ValidationMessage For="() => OrderItem.Fineness" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/orderitems">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private OrderItem? OrderItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        OrderItem ??= await context.OrderItems.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (OrderItem is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateOrderItem()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(OrderItem!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!OrderItemExists(OrderItem!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/orderitems");
+    }
+
+    private bool OrderItemExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.OrderItems.Any(e => e.Id == id);
+    }
+}

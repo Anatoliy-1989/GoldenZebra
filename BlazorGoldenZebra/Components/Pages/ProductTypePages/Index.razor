@@ -1,0 +1,36 @@
+﻿@page "/producttypes"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="producttypes/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.ProductTypes">
+    <PropertyColumn Property="producttype => producttype.Name" />
+
+    <TemplateColumn Context="producttype">
+        <a href="@($"producttypes/edit?id={producttype.Id}")">Edit</a> |
+        <a href="@($"producttypes/details?id={producttype.Id}")">Details</a> |
+        <a href="@($"producttypes/delete?id={producttype.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

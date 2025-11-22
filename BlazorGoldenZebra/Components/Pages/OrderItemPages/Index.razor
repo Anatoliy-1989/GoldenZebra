@@ -1,0 +1,41 @@
+﻿@page "/orderitems"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using BlazorGoldenZebra.Models
+@using BlazorGoldenZebra.Models
+@implements IAsyncDisposable
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="orderitems/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.OrderItems">
+    <PropertyColumn Property="orderitem => orderitem.MetalType" />
+    <PropertyColumn Property="orderitem => orderitem.ProductType" />
+    <PropertyColumn Property="orderitem => orderitem.OrderId" />
+    <PropertyColumn Property="orderitem => orderitem.WeightDirty" />
+    <PropertyColumn Property="orderitem => orderitem.WeightClean" />
+    <PropertyColumn Property="orderitem => orderitem.Fineness" />
+
+    <TemplateColumn Context="orderitem">
+        <a href="@($"orderitems/edit?id={orderitem.Id}")">Edit</a> |
+        <a href="@($"orderitems/details?id={orderitem.Id}")">Details</a> |
+        <a href="@($"orderitems/delete?id={orderitem.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private GoldenZebraSecurityContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

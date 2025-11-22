@@ -1,0 +1,44 @@
+﻿@page "/producttypes/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>ProductType</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="ProductType" OnValidSubmit="AddProductType" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="ProductType.Name" class="form-control" /> 
+                <ValidationMessage For="() => ProductType.Name" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/producttypes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private ProductType ProductType { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddProductType()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ProductTypes.Add(ProductType);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/producttypes");
+    }
+}

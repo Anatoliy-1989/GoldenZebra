@@ -1,0 +1,58 @@
+﻿@page "/counter/{initialCount:int?}"
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCountAsync">Click me Async</button>
+<MyButton OnClick="IncrementCount" class="btn btn-danger">Hello world</MyButton>
+
+<p>InitialCount = @InitialCount</p>
+
+<div>
+    <input @bind=bindedText @bind:event="oninput" @bind:after="Search"/>
+    <button @onclick="()=>bindedText=string.Empty">Clear</button>
+    <p>@bindedText</p>
+	<p>@SearcResult</p>
+</div>
+
+@code {
+
+	private string bindedText { get; set; }
+	private string SearcResult { get; set; }
+
+	private int currentCount = 0;
+
+	protected override void OnInitialized()
+	{
+		currentCount = InitialCount;
+	}
+
+	[Parameter]
+	public int IncrementAmount { get; set; } = 1;
+
+	// Маппится по имени. Маленькую букву меняет на большую (или регистр не важен)
+	[Parameter]
+	public int InitialCount { get; set; }
+
+	private void IncrementCount(MouseEventArgs e)
+	{
+		currentCount += IncrementAmount;
+	}
+
+	private async Task IncrementCountAsync()
+	{
+		await Task.Delay(1000);
+		currentCount += IncrementAmount;
+	}
+	private async Task Search()
+	{
+		SearcResult = "Searching...";
+		await Task.Delay(1000);
+		SearcResult = $"Found {Random.Shared.Next()} results!";
+	}
+}

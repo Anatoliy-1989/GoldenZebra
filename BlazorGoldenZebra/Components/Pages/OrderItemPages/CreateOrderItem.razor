@@ -1,0 +1,137 @@
+﻿@using BlazorGoldenZebra.Models.ViewModels
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "admin")]
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="OrderItem" OnValidSubmit="AddOrderItem" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="metaltype" class="form-label">Металл:</label>
+                <InputSelect @bind-Value="OrderItem.MetalType" class="form-select">
+                    @foreach (var metalType in MetalTypes)
+                    {
+                        <option value="@metalType.Id">@metalType.Name</option>
+                    }
+                </InputSelect>
+            </div>        
+            <div class="mb-3">
+                <label for="producttype" class="form-label">Тип:</label> 
+                <InputSelect @bind-Value="OrderItem.ProductType" class="form-select">
+                    @foreach (var productType in ProductTypes)
+                    {
+                        <option value="@productType.Id">@productType.Name</option>
+                    }
+                </InputSelect>
+            </div>        
+            <div class="mb-3">
+                <label for="weightdirty" class="form-label">Вес грязный:</label> 
+                <InputNumber id="weightdirty" @bind-Value="OrderItem.WeightDirty" class="form-control" /> 
+                <ValidationMessage For="() => OrderItem.WeightDirty" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="weightclean" class="form-label">Вес чистый:</label> 
+                <InputNumber id="weightclean" @bind-Value="OrderItem.WeightClean" class="form-control"  /> 
+                <ValidationMessage For="() => OrderItem.WeightClean" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="fineness" class="form-label">Проба:</label> 
+                <InputNumber id="fineness" @bind-Value="OrderItem.Fineness" class="form-control" /> 
+                <ValidationMessage For="() => OrderItem.Fineness" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="cost" class="form-label">Стоимость:</label>
+                <InputNumber id="cost" @bind-Value="OrderItem.Cost" class="form-control" />
+                <ValidationMessage For="() => OrderItem.Cost" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </EditForm>
+    </div>
+</div>
+
+@* <div>
+    <a href="/orderitems">Back to List</a>
+</div> *@
+
+@code {
+    [SupplyParameterFromForm]
+    public OrderItemViewModel OrderItem { get; set; } = new() { Fineness = 585 };
+
+    [Parameter]
+    public OrderItemViewModel ExistedOrderItem 
+    {
+        set
+        {
+            if (value != null)
+            {
+                this.OrderItem = value;
+            }
+        } 
+    }
+
+    private List<MetalType> MetalTypes;
+
+    private List<ProductType> ProductTypes;
+
+    [Parameter]
+    public Func<OrderItemViewModel, Task> AfterSave { get; set; }
+
+    // [Parameter]
+    // public List<OrderItemViewModel> OrderItems { get; set; }
+
+    protected override void OnInitialized()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        this.MetalTypes = context.MetalTypes.ToList();
+        this.ProductTypes = context.ProductTypes.ToList();
+
+        context.Dispose();
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddOrderItem()
+    {
+        if (OrderItem.MetalType <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не выбран тип металла!");
+            return;
+        }
+
+        if (OrderItem.ProductType <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Не выбран тип продукта!");
+            return;
+        }
+
+        if (OrderItem.WeightClean <= 0)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Нужно указать чистый вес!");
+            return;
+        }
+
+        // this.OrderItems.Add(OrderItem);
+
+        OrderItem.MetalTypeName = MetalTypes.Single(x => x.Id == OrderItem.MetalType).Name;
+        OrderItem.ProductTypeName = ProductTypes.Single(x => x.Id == OrderItem.ProductType).Name;
+        OrderItem.DefaultMetalFiness = MetalTypes.Single(x => x.Id == OrderItem.MetalType).DefaultFiness;
+
+        if (AfterSave != null)
+        {
+            await AfterSave(OrderItem);
+        }
+        
+        // using var context = DbFactory.CreateDbContext();
+        // context.OrderItems.Add(OrderItem);
+        // await context.SaveChangesAsync();
+        // NavigationManager.NavigateTo("/orderitems");
+    }
+}

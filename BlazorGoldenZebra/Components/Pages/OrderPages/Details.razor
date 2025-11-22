@@ -1,0 +1,52 @@
+﻿@page "/orders/details"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Order</h2>
+    <hr />
+    @if (order is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Date</dt>
+            <dd class="col-sm-10">@order.Date</dd>
+            <dt class="col-sm-2">DateCreate</dt>
+            <dd class="col-sm-10">@order.DateCreate</dd>
+            <dt class="col-sm-2">PlaceId</dt>
+            <dd class="col-sm-10">@order.PlaceId</dd>
+            <dt class="col-sm-2">UserId</dt>
+            <dd class="col-sm-10">@order.UserId</dd>
+        </dl>
+        <div>
+            <a href="@($"/orders/edit?id={order.Id}")">Edit</a> |
+            <a href="@($"/orders")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Order? order;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        order = await context.Orders.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (order is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

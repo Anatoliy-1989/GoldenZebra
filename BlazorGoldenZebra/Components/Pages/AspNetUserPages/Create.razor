@@ -1,0 +1,117 @@
+﻿@page "/aspnetusers/create"
+@using Microsoft.EntityFrameworkCore
+@using BlazorGoldenZebra.Models
+@inject IDbContextFactory<BlazorGoldenZebra.Models.GoldenZebraSecurityContext> DbFactory
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>AspNetUser</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="AspNetUser" OnValidSubmit="AddAspNetUser" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="username" class="form-label">UserName:</label> 
+                <InputText id="username" @bind-Value="AspNetUser.UserName" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.UserName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="normalizedusername" class="form-label">NormalizedUserName:</label> 
+                <InputText id="normalizedusername" @bind-Value="AspNetUser.NormalizedUserName" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.NormalizedUserName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="AspNetUser.Email" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="normalizedemail" class="form-label">NormalizedEmail:</label> 
+                <InputText id="normalizedemail" @bind-Value="AspNetUser.NormalizedEmail" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.NormalizedEmail" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="emailconfirmed" class="form-label">EmailConfirmed:</label> 
+                <InputCheckbox id="emailconfirmed" @bind-Value="AspNetUser.EmailConfirmed" class="form-check-input" /> 
+                <ValidationMessage For="() => AspNetUser.EmailConfirmed" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="passwordhash" class="form-label">PasswordHash:</label> 
+                <InputText id="passwordhash" @bind-Value="AspNetUser.PasswordHash" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.PasswordHash" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="securitystamp" class="form-label">SecurityStamp:</label> 
+                <InputText id="securitystamp" @bind-Value="AspNetUser.SecurityStamp" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.SecurityStamp" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="concurrencystamp" class="form-label">ConcurrencyStamp:</label> 
+                <InputText id="concurrencystamp" @bind-Value="AspNetUser.ConcurrencyStamp" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.ConcurrencyStamp" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="phonenumber" class="form-label">PhoneNumber:</label> 
+                <InputText id="phonenumber" @bind-Value="AspNetUser.PhoneNumber" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.PhoneNumber" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="phonenumberconfirmed" class="form-label">PhoneNumberConfirmed:</label> 
+                <InputCheckbox id="phonenumberconfirmed" @bind-Value="AspNetUser.PhoneNumberConfirmed" class="form-check-input" /> 
+                <ValidationMessage For="() => AspNetUser.PhoneNumberConfirmed" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="twofactorenabled" class="form-label">TwoFactorEnabled:</label> 
+                <InputCheckbox id="twofactorenabled" @bind-Value="AspNetUser.TwoFactorEnabled" class="form-check-input" /> 
+                <ValidationMessage For="() => AspNetUser.TwoFactorEnabled" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lockoutend" class="form-label">LockoutEnd:</label> 
+                <InputDate id="lockoutend" @bind-Value="AspNetUser.LockoutEnd" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.LockoutEnd" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="lockoutenabled" class="form-label">LockoutEnabled:</label> 
+                <InputCheckbox id="lockoutenabled" @bind-Value="AspNetUser.LockoutEnabled" class="form-check-input" /> 
+                <ValidationMessage For="() => AspNetUser.LockoutEnabled" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="accessfailedcount" class="form-label">AccessFailedCount:</label> 
+                <InputNumber id="accessfailedcount" @bind-Value="AspNetUser.AccessFailedCount" class="form-control" /> 
+                <ValidationMessage For="() => AspNetUser.AccessFailedCount" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/aspnetusers">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private AspNetUser AspNetUser { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddAspNetUser()
+    {
+        using var context = DbFactory.CreateDbContext();
+        AspNetUser.Id = Guid.NewGuid().ToString();
+        var firstRole = context.AspNetRoles.First();
+        if(AspNetUser.Roles == null)
+        {
+            AspNetUser.Roles = new List<AspNetRole>();
+        }
+
+        AspNetUser.Roles.Add(firstRole);
+        context.AspNetUsers.Add(AspNetUser);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/aspnetusers");
+    }
+}
