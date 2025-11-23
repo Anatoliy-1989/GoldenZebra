@@ -15,6 +15,10 @@
       "RelativeMoniker": "D:0:0:{5BFFBBCE-CE2A-4781-9229-09C2128A01F7}|BlazorGoldenZebra\\BlazorGoldenZebra.csproj|solutionrelative:blazorgoldenzebra\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{5BFFBBCE-CE2A-4781-9229-09C2128A01F7}|BlazorGoldenZebra\\BlazorGoldenZebra.csproj|c:\\users\\tolan\\onedrive\\\u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\github\\goldenzebra\\blazorgoldenzebra\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{5BFFBBCE-CE2A-4781-9229-09C2128A01F7}|BlazorGoldenZebra\\BlazorGoldenZebra.csproj|solutionrelative:blazorgoldenzebra\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5BFFBBCE-CE2A-4781-9229-09C2128A01F7}|BlazorGoldenZebra\\BlazorGoldenZebra.csproj|c:\\users\\tolan\\onedrive\\\u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\github\\goldenzebra\\blazorgoldenzebra\\utills\\configsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BFFBBCE-CE2A-4781-9229-09C2128A01F7}|BlazorGoldenZebra\\BlazorGoldenZebra.csproj|solutionrelative:blazorgoldenzebra\\utills\\configsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -78,11 +82,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Dockerfile",
+              "RelativeDocumentMoniker": "BlazorGoldenZebra\\Dockerfile",
+              "ToolTip": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Dockerfile",
+              "RelativeToolTip": "BlazorGoldenZebra\\Dockerfile",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-11-23T08:40:49.163Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -92,14 +109,14 @@
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\appsettings.Development.json",
               "ToolTip": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\appsettings.Development.json",
               "RelativeToolTip": "BlazorGoldenZebra\\appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAABEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-11-23T08:25:03.516Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ConfigSettings.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Utills\\ConfigSettings.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Utills\\ConfigSettings.cs",
@@ -117,9 +134,10 @@
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Program.cs",
               "ToolTip": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Program.cs",
               "RelativeToolTip": "BlazorGoldenZebra\\Program.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAACUAAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAtwGUAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-22T10:59:02.828Z"
+              "WhenOpened": "2025-11-22T10:59:02.828Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -129,14 +147,14 @@
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\appsettings.json",
               "ToolTip": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\appsettings.json",
               "RelativeToolTip": "BlazorGoldenZebra\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAABPAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-11-22T10:57:03.878Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "OrdersTotals.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Controls\\OrdersTotals.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Controls\\OrdersTotals.razor",
@@ -148,7 +166,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "OrderItemExportModel.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Models\\ViewModels\\OrderItemExportModel.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Models\\ViewModels\\OrderItemExportModel.cs",
@@ -160,7 +178,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "XmlWorker.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Utills\\XmlWorker.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Utills\\XmlWorker.cs",
@@ -172,7 +190,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "OrderExportModel.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Models\\ViewModels\\OrderExportModel.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Models\\ViewModels\\OrderExportModel.cs",
@@ -184,7 +202,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "OrderStatisticsViewModel.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Models\\ViewModels\\OrderStatisticsViewModel.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Models\\ViewModels\\OrderStatisticsViewModel.cs",
@@ -196,7 +214,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "MetalWorker.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Utills\\MetalWorker.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Utills\\MetalWorker.cs",
@@ -208,7 +226,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "CreateOrderItem.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Pages\\OrderItemPages\\CreateOrderItem.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Pages\\OrderItemPages\\CreateOrderItem.razor",
@@ -220,7 +238,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "OrderItemViewModel.cs",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Models\\ViewModels\\OrderItemViewModel.cs",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Models\\ViewModels\\OrderItemViewModel.cs",
@@ -232,7 +250,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "MainLayout.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Layout\\MainLayout.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Layout\\MainLayout.razor",
@@ -244,7 +262,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "app.css",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\wwwroot\\app.css",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\wwwroot\\app.css",
@@ -256,7 +274,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "CreateOrder.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Pages\\OrderPages\\CreateOrder.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Pages\\OrderPages\\CreateOrder.razor",
@@ -268,7 +286,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "OrdersStatistics.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Pages\\OrderPages\\OrdersStatistics.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Pages\\OrderPages\\OrdersStatistics.razor",
@@ -280,7 +298,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "OrderList.razor",
               "DocumentMoniker": "C:\\Users\\tolan\\OneDrive\\\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B\\Github\\GoldenZebra\\BlazorGoldenZebra\\Components\\Pages\\OrderPages\\OrderList.razor",
               "RelativeDocumentMoniker": "BlazorGoldenZebra\\Components\\Pages\\OrderPages\\OrderList.razor",
