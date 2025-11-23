@@ -1,7 +1,0 @@
-wwwroot\app.css
-wwwroot\bootstrap\bootstrap.min.css
-wwwroot\bootstrap\bootstrap.min.css.map
-wwwroot\favicon.png
-C:\Users\tolan\OneDrive\Документы\Github\GoldenZebra\BlazorGoldenZebra\wwwroot\bootstrap\bootstrap.min.css.map
-C:\Users\tolan\OneDrive\Документы\Github\GoldenZebra\BlazorGoldenZebra\wwwroot\bootstrap\bootstrap.min.css
-C:\Users\tolan\OneDrive\Документы\Github\GoldenZebra\BlazorGoldenZebra\wwwroot\app.css
