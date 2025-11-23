@@ -42,6 +42,9 @@ public partial class GoldenZebraSecurityContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        Console.WriteLine($"{DateTime.Now} OnModelCreating Start");
+
         modelBuilder.Entity<AspNetRole>(entity =>
         {
             if (ConfigSettings.UsePostgres)
@@ -146,6 +149,8 @@ public partial class GoldenZebraSecurityContext : DbContext
                 );
         });
 
+        Console.WriteLine($"{DateTime.Now} OnModelCreating Middle");
+
         modelBuilder.Entity<Movie>(entity =>
         {
             entity.ToTable("Movie");
@@ -224,6 +229,8 @@ public partial class GoldenZebraSecurityContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+
+        Console.WriteLine($"{DateTime.Now} OnModelCreating End");
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
