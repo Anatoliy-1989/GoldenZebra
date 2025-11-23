@@ -20,7 +20,7 @@ var connectionString = string.Empty;
 
 if (usePostgres)
 {
-    var privateConnectionString = "Host=192.168.0.4;Password=$ga8sr533S;Persist Security Info=True;Username=gen_user;Database=GoldenZebra";
+    var privateConnectionString = "Host=192.168.0.4;Password=$ga8sr533S;Persist Security Info=True;Username=gen_user;Database=goldenzebra";
 
     connectionString = builder.Configuration.GetConnectionString("GoldenZebraSecurityContextPostgres")
         ?? throw new InvalidOperationException("Connection string 'GoldenZebraSecurityContextPostgres' not found.");
