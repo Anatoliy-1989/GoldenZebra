@@ -20,15 +20,17 @@ var connectionString = string.Empty;
 
 if (usePostgres)
 {
+    var privateConnectionString = "Host=192.168.0.4:5432;Password=$ga8sr533S;Persist Security Info=True;Username=gen_user;Database=GoldenZebra";
+
     connectionString = builder.Configuration.GetConnectionString("GoldenZebraSecurityContextPostgres")
         ?? throw new InvalidOperationException("Connection string 'GoldenZebraSecurityContextPostgres' not found.");
     builder.Services.AddDbContextFactory<GoldenZebraSecurityContext>(options =>
-        options.UseNpgsql(connectionString), ServiceLifetime.Transient);
+        options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
 
     connectionString = builder.Configuration.GetConnectionString("DefaultConnectionPostgres")
         ?? throw new InvalidOperationException("Connection string 'DefaultConnectionPostgres' not found.");
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString), ServiceLifetime.Transient);
+        options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
 }
 else if (useMySql)
 {
