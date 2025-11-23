@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazorGoldenZebra")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f4f2e119e1108577afa54d103d307c2ee8cccb33")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorGoldenZebra")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorGoldenZebra")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

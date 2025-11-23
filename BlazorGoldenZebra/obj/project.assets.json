@@ -8581,11 +8581,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tolan\\source\\repos\\BlazorGoldenZebraWebSite\\BlazorGoldenZebra\\BlazorGoldenZebra.csproj",
+      "projectUniqueName": "C:\\Users\\tolan\\OneDrive\\Документы\\Github\\GoldenZebra\\BlazorGoldenZebra\\BlazorGoldenZebra.csproj",
       "projectName": "BlazorGoldenZebra",
-      "projectPath": "C:\\Users\\tolan\\source\\repos\\BlazorGoldenZebraWebSite\\BlazorGoldenZebra\\BlazorGoldenZebra.csproj",
+      "projectPath": "C:\\Users\\tolan\\OneDrive\\Документы\\Github\\GoldenZebra\\BlazorGoldenZebra\\BlazorGoldenZebra.csproj",
       "packagesPath": "C:\\Users\\tolan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tolan\\source\\repos\\BlazorGoldenZebraWebSite\\BlazorGoldenZebra\\obj\\",
+      "outputPath": "C:\\Users\\tolan\\OneDrive\\Документы\\Github\\GoldenZebra\\BlazorGoldenZebra\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
