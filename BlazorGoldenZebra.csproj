@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-BlazorGoldenZebra-28edbbf4-2b18-4069-b66b-3f0c4270085a</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,7 +30,6 @@
 
   <ItemGroup>
     <None Include="efpt.config.json.user" />
-	<Nullable>enable</Nullable>
   </ItemGroup>
-
+  
 </Project>
