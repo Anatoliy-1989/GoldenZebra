@@ -13,6 +13,8 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
+    builder.WebHost.UseUrls("http://0.0.0.0:8080");
+
     var usePostgres = builder.Configuration.GetValue<bool>("UsePostgres");
     var useMySql = builder.Configuration.GetValue<bool>("UseMySql");
 
