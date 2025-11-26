@@ -22,7 +22,7 @@ Console.WriteLine($"{DateTime.Now} Gold is started");
 
 if (usePostgres)
 {
-    var privateConnectionString = "Host=192.168.0.4;Password=$ga8sr533S;Persist Security Info=True;Username=gen_user;Database=default_db";
+    var privateConnectionString = "Host=192.168.0.4;Password=$ga8sr533S;Username=gen_user;Database=default_db";
 
     Console.WriteLine($"{DateTime.Now} In connection Start");
 
