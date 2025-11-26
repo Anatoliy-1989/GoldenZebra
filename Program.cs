@@ -18,7 +18,7 @@ ConfigSettings.UseMySql = useMySql;
 
 var connectionString = string.Empty;
 
-Console.WriteLine($"{DateTime.Now} App is started");
+Console.WriteLine($"{DateTime.Now} Application is started");
 
 if (usePostgres)
 {
