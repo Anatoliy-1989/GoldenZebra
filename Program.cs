@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.RegularExpressions;
 
 try
 {
@@ -29,13 +30,26 @@ try
     {
         // var privateConnectionString = "Host=37.252.19.118;Password=$ga8sr533S;Username=gen_user;Database=default_db";
 
+        connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+        Console.WriteLine($"DefaultConnection: {connectionString}");
+
+        var rHost = Regex.Match(connectionString, "Host=(?<host>[^;]+)(;|$)");
+        var rPassword = Regex.Match(connectionString, "Password=(?<password>[^;]+)(;|$)");
+        var rUsername = Regex.Match(connectionString, "Username=(?<username>[^;]+)(;|$)");
+        var rDatabase = Regex.Match(connectionString, "Database=(?<database>[^;]+)(;|$)");
+
+        var privateConnectionString = $"Host={rHost.Groups["host"].Value};Password={rPassword.Groups["password"].Value};Username={rUsername.Groups["username"].Value};Database={rDatabase.Groups["database"].Value}";
+
+        Console.WriteLine($"privateConnectionString: {privateConnectionString}");
+
         Console.WriteLine($"{DateTime.Now} In connection Start");
         
         //connectionString = builder.Configuration.GetConnectionString("GoldenZebraSecurityContextPostgres")
         connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         builder.Services.AddDbContextFactory<GoldenZebraSecurityContext>(options =>
-            options.UseNpgsql(connectionString), ServiceLifetime.Transient);
+            options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
 
         Console.WriteLine($"{DateTime.Now} In connection Middle");
 
@@ -43,7 +57,7 @@ try
         connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString), ServiceLifetime.Transient);
+            options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
 
         Console.WriteLine($"{DateTime.Now} In connection End");
     }
