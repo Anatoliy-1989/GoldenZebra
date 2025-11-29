@@ -27,21 +27,21 @@ try
 
     if (usePostgres)
     {
-        var privateConnectionString = "Host=37.252.19.118;Password=$ga8sr533S;Username=gen_user;Database=default_db";
+        // var privateConnectionString = "Host=37.252.19.118;Password=$ga8sr533S;Username=gen_user;Database=default_db";
 
         Console.WriteLine($"{DateTime.Now} In connection Start");
 
         connectionString = builder.Configuration.GetConnectionString("GoldenZebraSecurityContextPostgres")
             ?? throw new InvalidOperationException("Connection string 'GoldenZebraSecurityContextPostgres' not found.");
         builder.Services.AddDbContextFactory<GoldenZebraSecurityContext>(options =>
-            options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
+            options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
         Console.WriteLine($"{DateTime.Now} In connection Middle");
 
         connectionString = builder.Configuration.GetConnectionString("DefaultConnectionPostgres")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnectionPostgres' not found.");
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(privateConnectionString), ServiceLifetime.Transient);
+            options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
         Console.WriteLine($"{DateTime.Now} In connection End");
     }

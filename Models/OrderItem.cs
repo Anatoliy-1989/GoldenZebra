@@ -15,9 +15,9 @@ public partial class OrderItem
 
     public int OrderId { get; set; }
 
-    public decimal? WeightDirty { get; set; }
+    public decimal WeightDirty { get; set; }
 
-    public decimal WeightClean { get; set; }
+    public decimal? WeightClean { get; set; }
 
     public int Fineness { get; set; }
 

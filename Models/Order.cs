@@ -17,6 +17,8 @@ public partial class Order
 
     public string UserId { get; set; }
 
+    public string Comment { get; set; }
+
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual Place Place { get; set; }

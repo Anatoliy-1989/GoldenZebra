@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using BlazorGoldenZebra.Utills;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace BlazorGoldenZebra.Models.ViewModels
@@ -13,9 +14,9 @@ namespace BlazorGoldenZebra.Models.ViewModels
 
         public int OrderId { get; set; }
 
-        public decimal? WeightDirty { get; set; }
+        public decimal WeightDirty { get; set; }
 
-        public decimal WeightClean { get; set; }
+        public decimal? WeightClean { get; set; }
 
         public int Fineness { get; set; }
 
@@ -35,7 +36,7 @@ namespace BlazorGoldenZebra.Models.ViewModels
             {
                 if (this.DefaultMetalFiness > 0 && this.WeightClean > 0 && this.Fineness > 0)
                 {
-                    var inDefaultFiness = this.WeightClean * this.Fineness / this.DefaultMetalFiness;
+                    var inDefaultFiness = MetalWorker.GetDefaultFinessWeight(this.WeightClean, this.Fineness, this.DefaultMetalFiness);
                     return inDefaultFiness.ToString("F2");
                 }
 

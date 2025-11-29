@@ -5,9 +5,14 @@ namespace BlazorGoldenZebra.Utills
 {
     public static class MetalWorker
     {
-        public static decimal GetDefaultFinessWeight(decimal weightClean, int fineness, int defaultFiness)
+        public static decimal GetDefaultFinessWeight(decimal? weightClean, int fineness, int defaultFiness)
         {
-            return weightClean * fineness / defaultFiness;
+            if (weightClean.HasValue)
+            {
+                return weightClean.Value * fineness / defaultFiness;
+            }
+
+            return 0;
         }
 
         public static decimal? GetScrapDefaultFinessWeight(Order order, MetalType metal)
@@ -30,7 +35,7 @@ namespace BlazorGoldenZebra.Utills
         public static decimal? GetProductWeight(Order order)
         {
             var productOrderItems = order.OrderItems.Where(x => x.ProductType == (int)ProductTypesEnum.Product);
-            var sum = productOrderItems.Sum(oi => oi.WeightClean);
+            var sum = productOrderItems.Sum(oi => oi.WeightClean ?? 0);
             sum = Decimal.Round(sum, 2);
             return sum == 0 ? null : sum;
         }

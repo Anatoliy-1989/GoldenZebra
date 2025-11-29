@@ -12,6 +12,8 @@
 
         public string UserId { get; set; }
 
+        public string Comment { get; set; }
+
         public List<OrderItemViewModel> OrderItems { get; set; } = new List<OrderItemViewModel>();
 
         public void InitFromOrder(Order order)
@@ -21,6 +23,7 @@
             this.DateCreate = order.DateCreate;
             this.PlaceId = order.PlaceId;
             this.UserId = order.UserId;
+            this.Comment = order.Comment;
 
             foreach (var orderItem in order.OrderItems)
             {

@@ -82,3 +82,20 @@ h1:focus {
     /* Занимает всё оставшееся пространство */
     overflow: auto;
 }
+
+.form-group.row {
+    margin-bottom: 2px;
+}
+
+.logo-img {
+    height: 40px; /* Adjust height as needed */
+    width: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Add some space between the logo and text */
+    vertical-align: middle; /* Align vertically with the text */
+}
+
+/* Optional: adjust the brand container for better alignment if needed */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}

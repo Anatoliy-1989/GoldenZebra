@@ -128,7 +128,23 @@
         {
             await AfterSave(OrderItem);
         }
-        
+
+        var newOrderItem = new OrderItemViewModel()
+        {
+            Fineness = OrderItem.Fineness,
+            MetalType = OrderItem.MetalType,
+            MetalTypeName = OrderItem.MetalTypeName,
+            OrderId = OrderItem.OrderId,
+            ProductType = OrderItem.ProductType,
+            ProductTypeName = OrderItem.ProductTypeName,
+            WeightClean = OrderItem.WeightClean,
+            WeightDirty = OrderItem.WeightDirty,
+            DefaultMetalFiness = OrderItem.DefaultMetalFiness,
+            Cost = OrderItem.Cost,
+        };
+
+        this.OrderItem = newOrderItem;
+
         // using var context = DbFactory.CreateDbContext();
         // context.OrderItems.Add(OrderItem);
         // await context.SaveChangesAsync();

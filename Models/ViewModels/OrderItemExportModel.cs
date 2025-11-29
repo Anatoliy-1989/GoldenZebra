@@ -7,9 +7,9 @@ namespace BlazorGoldenZebra.Models.ViewModels
     {
         public int MetalType { get; set; }
 
-        public decimal? WeightDirty { get; set; }
+        public decimal WeightDirty { get; set; }
 
-        public decimal WeightClean { get; set; }
+        public decimal? WeightClean { get; set; }
 
         public ProductTypesEnum ProductType { get; set; }
 

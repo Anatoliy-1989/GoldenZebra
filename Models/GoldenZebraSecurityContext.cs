@@ -173,7 +173,9 @@ public partial class GoldenZebraSecurityContext : DbContext
                 entity.Property(e => e.DateCreate).HasColumnType("datetime");
             }
 
-                entity.Property(e => e.UserId).HasMaxLength(450);
+            entity.Property(e => e.UserId).HasMaxLength(450);
+
+            entity.Property(e => e.Comment).HasColumnType("text");
 
             entity.HasOne(d => d.Place).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PlaceId)

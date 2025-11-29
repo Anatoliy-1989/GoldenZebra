@@ -191,8 +191,8 @@ namespace BlazorGoldenZebra.Utills
                 row.Cell(i).Value = $"Сумма изделий {metalType.Name}"; i++;
             }
 
-            row.Cell(i).Value = "Кол. пакетов"; i++;
             row.Cell(i).Value = "Кол. позиций"; i++;
+            row.Cell(i).Value = "Кол. пакетов"; i++;
         }
 
         private static void CreateDataRow(IXLWorksheet worksheet, int rowNumber, OrderExportModel orderExportModel, List<MetalType> metalTypes)

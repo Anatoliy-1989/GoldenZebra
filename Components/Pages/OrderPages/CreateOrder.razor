@@ -23,16 +23,29 @@
 <PageTitle>Создание пакета</PageTitle>
 <div class="box-container">
     <div class="filter-section">
-<h1>Добавление пакета</h1>
+        @if (Mode == "show")
+        {
+            <h2>Просмотр пакета</h2>
+        }
+        else if (Mode == "create")
+        {
+            <h2>Добавление пакета</h2>
+        }
+        else if (Mode == "edit")
+        {
+            <h2>Редактирование пакета</h2>
+        }
+        
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="form-row">
         <EditForm Model="Order" method="post" OnValidSubmit="AddOrder" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert"/>
             <input type="hidden" name="Order.Id" value="@Order.Id" />
-            <div class="mb-3">
-                <label for="userid" class="form-label">Пользователь:</label>
+                    <div class="form-group row">
+                        <label for="userid" class="col-sm-2 col-form-label">Пользователь:</label>
+                        <div class="col-sm-10">
                 <AuthorizeView Roles="admin" Context="authContext">
                     <Authorized>
                         <InputSelect @bind-Value="Order.UserId" class="form-select">
@@ -51,12 +64,13 @@
                         </InputSelect>
                     </NotAuthorized>
                 </AuthorizeView>
-                
-                    
+
                 <ValidationMessage For="() => Order.UserId" class="text-danger" />
+                        </div>
             </div>
-            <div class="mb-3">
-                <label for="date" class="form-label">Дата и время:</label> 
+                    <div class="form-group row">
+                        <label for="date" class="col-sm-2 col-form-label">Дата и время:</label>
+                        <div class="col-sm-10">
                 @if (Mode == "show")
                 {
                     <InputDate id="date" Type="InputDateType.DateTimeLocal" @bind-Value="Order.Date" class="form-control" disabled />
@@ -77,10 +91,12 @@
                     </AuthorizeView>
                 }
 
-                <ValidationMessage For="() => Order.Date" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="placeid" class="form-label">Отделение:</label> 
+                <ValidationMessage For="() => Order.Date" class="text-danger" />
+                        </div>
+            </div>
+                    <div class="form-group row">
+                        <label for="placeid" class="col-sm-2 col-form-label">Отделение:</label>
+                        <div class="col-sm-10">
                 @if (Mode == "show")
                 {
                     <InputSelect @bind-Value="Order.PlaceId" class="form-select" disabled>
@@ -120,22 +136,49 @@
                         </NotAuthorized>
                     </AuthorizeView>
                 }
-                <ValidationMessage For="() => Order.PlaceId" class="text-danger" /> 
-            </div>        
+                <ValidationMessage For="() => Order.PlaceId" class="text-danger" />
+                        </div>
+            </div>
+                    <div class="form-group row">
+                        <label for="date" class="col-sm-2 col-form-label">Комментарий:</label>
+                        <div class="col-sm-10">
+                        @if (Mode == "show")
+                        {
+                            <TextAreaInput id="comment" @bind-Value="Order.Comment" class="form-control" disabled />
+                        }
+                        else if (Mode == "create")
+                        {
+                                <TextAreaInput id="comment" @bind-Value="Order.Comment" class="form-control" />
+                        }
+                        else if (Mode == "edit")
+                        {
+                            <AuthorizeView Roles="admin" Context="authContext">
+                                <Authorized>
+                                        <TextAreaInput id="comment" @bind-Value="Order.Comment" class="form-control" />
+                                </Authorized>
+                                <NotAuthorized>
+                                        <TextAreaInput id="comment" @bind-Value="Order.Comment" class="form-control" disabled />
+                                </NotAuthorized>
+                            </AuthorizeView>
+                        }
+
+                        <ValidationMessage For="() => Order.Date" class="text-danger" />
+                        </div>
+                    </div>
              <div class="btn-group" role="group" aria-label="Basic example">
-                    <a class="btn btn-secondary" href="/orders"><i class="bi bi-arrow-left"></i> Назад к списку</a>
+                        <a class="btn btn-sm btn-secondary" href="/orders"><i class="bi bi-arrow-left"></i> Назад к списку</a>
             @if (Mode == "show")
             {
             }
             else if (Mode == "create")
             {
-                <button type="submit" class="btn btn-success"><i class="bi bi-file-earmark-plus"></i> Создать</button>
+                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-file-earmark-plus"></i> Создать</button>
             }
             else if (Mode == "edit")
             {
                 <AuthorizeView Roles="admin" Context="authContext">
                     <Authorized>
-                        <button type="submit" class="btn btn-warning"><i class="bi bi-pencil"></i> Сохранить</button>
+                        <button type="submit" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Сохранить</button>
                     </Authorized>
                 </AuthorizeView>
             }
@@ -150,13 +193,13 @@
         }
         else if (Mode == "create")
         {
-            <Button Color="ButtonColor.Primary" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
+            <Button Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
         }
         else if (Mode == "edit")
         {
             <AuthorizeView Roles="admin" Context="authContext">
                 <Authorized>
-                    <Button Color="ButtonColor.Primary" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
+                            <Button Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="AddOrderItemAsync"><i class="bi bi-plus"></i> Добавить позицию</Button>
                 </Authorized>
             </AuthorizeView>
         }
@@ -290,7 +333,8 @@
             Date = this.Order.Date,
             DateCreate = DateTime.Now,
             PlaceId = this.Order.PlaceId,
-            UserId = this.Order.UserId
+            UserId = this.Order.UserId,
+            Comment = this.Order.Comment
         };
 
         foreach (var newItem in this.Order.OrderItems)
@@ -334,21 +378,7 @@
         oldOrder.Date = this.Order.Date;
         oldOrder.PlaceId = this.Order.PlaceId;
         oldOrder.UserId = this.Order.UserId;
-
-        foreach (var orderItemView in this.Order.OrderItems)
-        {
-            if (orderItemView.Id == 0)
-            {
-                // Add new
-                oldOrder.OrderItems.Add(CreateOrderItemFromModel(orderItemView));
-            }
-            else
-            {
-                // Modify existed
-                var oldOrderItem = oldOrder.OrderItems.Single(x => x.Id == orderItemView.Id);
-                MapOrderItemFromModel(oldOrderItem, orderItemView);
-            }
-        }
+        oldOrder.Comment = this.Order.Comment;
 
         List<OrderItem> badOrderItems = new List<OrderItem>();
 
@@ -365,6 +395,21 @@
         foreach (var badOrderItem in badOrderItems)
         {
             oldOrder.OrderItems.Remove(badOrderItem);
+        }
+
+        foreach (var orderItemView in this.Order.OrderItems)
+        {
+            if (orderItemView.Id == 0)
+            {
+                // Add new
+                oldOrder.OrderItems.Add(CreateOrderItemFromModel(orderItemView));
+            }
+            else
+            {
+                // Modify existed
+                var oldOrderItem = oldOrder.OrderItems.Single(x => x.Id == orderItemView.Id);
+                MapOrderItemFromModel(oldOrderItem, orderItemView);
+            }
         }
 
         await context.SaveChangesAsync();
@@ -396,7 +441,7 @@
         var newOrderItem = new OrderItemViewModel()
             {
                 Fineness = orderItem.Fineness,
-                Id = orderItem.Id,
+            // Id = orderItem.Id,
                 MetalType = orderItem.MetalType,
                 MetalTypeName = orderItem.MetalTypeName,
                 OrderId = orderItem.OrderId,
@@ -416,6 +461,19 @@
     private async Task HideModal2(OrderItemViewModel orderItem)
     {
         await modal.HideAsync();
+
+        // var existedOrderItem = this.Order.OrderItems.Single(x => x.Id == orderItem.Id);
+        // existedOrderItem.Fineness = orderItem.Fineness;
+        // // Id = orderItem.Id,
+        // existedOrderItem.MetalType = orderItem.MetalType;
+        // existedOrderItem.MetalTypeName = orderItem.MetalTypeName;
+        // existedOrderItem.OrderId = orderItem.OrderId;
+        // existedOrderItem.ProductType = orderItem.ProductType;
+        // existedOrderItem.ProductTypeName = orderItem.ProductTypeName;
+        // existedOrderItem.WeightClean = orderItem.WeightClean;
+        // existedOrderItem.WeightDirty = orderItem.WeightDirty;
+        // existedOrderItem.DefaultMetalFiness = orderItem.DefaultMetalFiness;
+        // existedOrderItem.Cost = orderItem.Cost;
 
         this.StateHasChanged();
     }
